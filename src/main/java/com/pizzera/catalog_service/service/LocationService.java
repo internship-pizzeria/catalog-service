@@ -1,7 +1,6 @@
 package com.pizzera.catalog_service.service;
 
 import com.pizzera.catalog_service.dto.LocationResponse;
-import com.pizzera.catalog_service.entity.Location;
 import com.pizzera.catalog_service.repository.LocationRepository;
 import org.springframework.stereotype.Service;
 

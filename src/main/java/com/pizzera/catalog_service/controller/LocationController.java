@@ -2,7 +2,6 @@ package com.pizzera.catalog_service.controller;
 
 
 import com.pizzera.catalog_service.dto.LocationResponse;
-import com.pizzera.catalog_service.entity.Location;
 import com.pizzera.catalog_service.service.LocationService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
