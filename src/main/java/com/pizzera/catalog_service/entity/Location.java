@@ -21,7 +21,7 @@ public class Location {
     @Column(nullable = false)
     private String address;
 
-    private boolean is_Active = true;
+    private boolean isActive = true;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
