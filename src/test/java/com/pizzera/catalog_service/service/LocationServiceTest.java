@@ -28,6 +28,7 @@ class LocationServiceTest {
     private LocationService locationService;
 
     @Test
+    // GIVEN
     void shouldReturnPageOfActiveLocations() {
         Location location = new Location();
         location.setId(1L);
@@ -43,8 +44,10 @@ class LocationServiceTest {
 
         when(locationRepository.findByIsActiveTrue(pageable)).thenReturn(locationPage);
 
+        // WHEN
         Page<LocationResponse> result = locationService.getAllActiveLocations(null, pageable);
 
+        // THEN
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
 
@@ -61,11 +64,14 @@ class LocationServiceTest {
 
     @Test
     void shouldReturnEmptyPageWhenNoActiveLocations() {
+        // GIVEN
         Pageable pageable = PageRequest.of(0, 10);
         when(locationRepository.findByIsActiveTrue(pageable)).thenReturn(Page.empty());
 
+        // WHEN
         Page<LocationResponse> result = locationService.getAllActiveLocations(null, pageable);
 
+        // THEN
         assertNotNull(result);
         assertTrue(result.isEmpty());
         verify(locationRepository, times(1)).findByIsActiveTrue(pageable);
@@ -73,6 +79,7 @@ class LocationServiceTest {
 
     @Test
     void shouldFilterLocationsByCity() {
+        // GIVEN
         Pageable pageable = PageRequest.of(0, 10);
         Location location = new Location();
         location.setId(1L);
@@ -87,8 +94,11 @@ class LocationServiceTest {
         when(locationRepository.findByIsActiveTrueAndCityContainingIgnoreCase("Zielona", pageable))
                 .thenReturn(locationPage);
 
+        // WHEN
         Page<LocationResponse> result = locationService.getAllActiveLocations("Zielona", pageable);
 
+
+        // THEN
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals("Zielona Góra", result.getContent().get(0).city());
