@@ -1,12 +1,14 @@
 package com.pizzera.catalog_service.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "locations")
 public class Location {
@@ -19,7 +21,13 @@ public class Location {
     private String city;
 
     @Column(nullable = false)
-    private String address;
+    private String street;
+
+    @Column(nullable = false)
+    private String buildingNumber;
+
+    @Column(nullable = false)
+    private String countryCode;
 
     private boolean isActive = true;
 
