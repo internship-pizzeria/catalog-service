@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
@@ -26,26 +27,23 @@ class LocationServiceTest {
 
     @Test
     void shouldReturnPageOfActiveLocations() {
-        // GIVEN
-        Location location = new Location();
-        location.setId(1L);
-        location.setCity("Zielona Góra");
-        location.setPostalCode("65-001");
-        location.setStreet("Wyszyńskiego");
-        location.setBuildingNumber("4");
-        location.setCountryCode("PL");
-        location.setTimezone("Europe/Warsaw");
-        location.setStatus(LocationStatus.ACTIVE);
+        Location location = new Location(
+                "Zielona Góra",
+                "65-001",
+                "Wyszyńskiego",
+                "4",
+                "PL",
+                "Europe/Warsaw"
+        );
+        ReflectionTestUtils.setField(location, "id", 1L);
 
         Pageable pageable = PageRequest.of(0, 10);
         Page<Location> locationPage = new PageImpl<>(List.of(location));
 
         when(locationRepository.findByStatus(LocationStatus.ACTIVE, pageable)).thenReturn(locationPage);
 
-        // WHEN
         Page<LocationResponse> result = locationService.getAllActiveLocations(null, pageable);
 
-        // THEN
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
 
@@ -64,14 +62,11 @@ class LocationServiceTest {
 
     @Test
     void shouldReturnEmptyPageWhenNoActiveLocations() {
-        // GIVEN
         Pageable pageable = PageRequest.of(0, 10);
         when(locationRepository.findByStatus(LocationStatus.ACTIVE, pageable)).thenReturn(Page.empty());
 
-        // WHEN
         Page<LocationResponse> result = locationService.getAllActiveLocations(null, pageable);
 
-        // THEN
         assertNotNull(result);
         assertTrue(result.isEmpty());
         verify(locationRepository, times(1)).findByStatus(LocationStatus.ACTIVE, pageable);
@@ -79,27 +74,23 @@ class LocationServiceTest {
 
     @Test
     void shouldFilterLocationsByCity() {
-        // GIVEN
         Pageable pageable = PageRequest.of(0, 10);
-        Location location = new Location();
-        location.setId(1L);
-        location.setCity("Zielona Góra");
-        location.setPostalCode("65-001");
-        location.setStreet("Wyszyńskiego");
-        location.setBuildingNumber("4");
-        location.setCountryCode("PL");
-        location.setTimezone("Europe/Warsaw");
-        location.setStatus(LocationStatus.ACTIVE);
+        Location location = new Location(
+                "Zielona Góra",
+                "65-001",
+                "Wyszyńskiego",
+                "4",
+                "PL",
+                "Europe/Warsaw"
+        );
 
         Page<Location> locationPage = new PageImpl<>(List.of(location));
 
         when(locationRepository.findByStatusAndCityContainingIgnoreCase(LocationStatus.ACTIVE, "Zielona", pageable))
                 .thenReturn(locationPage);
 
-        // WHEN
         Page<LocationResponse> result = locationService.getAllActiveLocations("Zielona", pageable);
 
-        // THEN
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals("Zielona Góra", result.getContent().get(0).city());

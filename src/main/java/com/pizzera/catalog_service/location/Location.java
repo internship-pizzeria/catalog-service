@@ -8,7 +8,6 @@ import java.time.Instant;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Entity
 @Table(name = "locations")
 public class Location {
@@ -41,4 +40,14 @@ public class Location {
 
     @CreationTimestamp
     private Instant createdAt;
+
+    public Location(String city, String postalCode, String street, String buildingNumber, String countryCode, String timezone) {
+        this.city = city;
+        this.postalCode = postalCode;
+        this.street = street;
+        this.buildingNumber = buildingNumber;
+        this.countryCode = countryCode;
+        this.timezone = timezone;
+        this.status = LocationStatus.ACTIVE;
+    }
 }
