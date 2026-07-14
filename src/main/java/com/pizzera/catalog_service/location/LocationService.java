@@ -1,6 +1,7 @@
 package com.pizzera.catalog_service.location;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ public class LocationService {
     private final LocationRepository locationRepository;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "locations")
     public Page<LocationResponse> getAllActiveLocations(String city, Pageable pageable) {
         if (city != null && !city.isBlank()) {
             String trimmedCity = city.trim();
