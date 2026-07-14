@@ -48,6 +48,5 @@ public class Location {
         this.buildingNumber = buildingNumber;
         this.countryCode = countryCode;
         this.timezone = timezone;
-        this.status = LocationStatus.ACTIVE;
     }
 }
