@@ -43,8 +43,7 @@ class LocationServiceTest {
 
         when(locationRepository.findByIsActiveTrue(pageable)).thenReturn(locationPage);
 
-        Page<LocationResponse> result = locationService.getAllActiveLocations(pageable);
-
+        Page<LocationResponse> result = locationService.getAllActiveLocations(null, pageable);
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
@@ -65,10 +64,38 @@ class LocationServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         when(locationRepository.findByIsActiveTrue(pageable)).thenReturn(Page.empty());
 
-        Page<LocationResponse> result = locationService.getAllActiveLocations(pageable);
+        Page<LocationResponse> result = locationService.getAllActiveLocations(null, pageable);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());
         verify(locationRepository, times(1)).findByIsActiveTrue(pageable);
     }
+
+    @Test
+    void shouldFilterLocationsByCity() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Location location = new Location();
+        location.setId(1L);
+        location.setCity("Zielona Góra");
+        location.setStreet("Wyszyńskiego");
+        location.setBuildingNumber("4");
+        location.setCountryCode("PL");
+        location.setActive(true);
+
+        Page<Location> locationPage = new PageImpl<>(List.of(location));
+
+        when(locationRepository.findByIsActiveTrueAndCityContainingIgnoreCase("Zielona", pageable))
+                .thenReturn(locationPage);
+
+        Page<LocationResponse> result = locationService.getAllActiveLocations("Zielona", pageable);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Zielona Góra", result.getContent().get(0).city());
+
+        verify(locationRepository, times(1)).findByIsActiveTrueAndCityContainingIgnoreCase("Zielona", pageable);
+        verify(locationRepository, never()).findByIsActiveTrue(any());
+    }
+
+
 }

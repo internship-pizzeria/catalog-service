@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface LocationRepository extends JpaRepository<Location, Long> {
     Page<Location> findByIsActiveTrue(Pageable pageable);
 
+    Page<Location> findByIsActiveTrueAndCityContainingIgnoreCase(String city, Pageable pageable);
+
 }
