@@ -1,7 +1,5 @@
-package com.pizzera.catalog_service.service;
+package com.pizzera.catalog_service.location;
 
-import com.pizzera.catalog_service.dto.LocationResponse;
-import com.pizzera.catalog_service.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +15,11 @@ public class LocationService {
     @Transactional(readOnly = true)
     public Page<LocationResponse> getAllActiveLocations(String city, Pageable pageable) {
         if (city != null && !city.isBlank()) {
-            return locationRepository.findByIsActiveTrueAndCityContainingIgnoreCase(city, pageable)
+            String trimmedCity = city.trim();
+            return locationRepository.findByStatusAndCityContainingIgnoreCase(LocationStatus.ACTIVE, trimmedCity, pageable)
                     .map(LocationResponse::new);
         }
-        return locationRepository.findByIsActiveTrue(pageable)
+        return locationRepository.findByStatus(LocationStatus.ACTIVE, pageable)
                 .map(LocationResponse::new);
     }
 }

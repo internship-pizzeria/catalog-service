@@ -1,8 +1,6 @@
-package com.pizzera.catalog_service.controller;
+package com.pizzera.catalog_service.location;
 
 
-import com.pizzera.catalog_service.dto.LocationResponse;
-import com.pizzera.catalog_service.service.LocationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

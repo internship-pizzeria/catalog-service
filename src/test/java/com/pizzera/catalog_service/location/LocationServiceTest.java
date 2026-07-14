@@ -1,8 +1,5 @@
-package com.pizzera.catalog_service.service;
+package com.pizzera.catalog_service.location;
 
-import com.pizzera.catalog_service.dto.LocationResponse;
-import com.pizzera.catalog_service.entity.Location;
-import com.pizzera.catalog_service.repository.LocationRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,21 +25,22 @@ class LocationServiceTest {
     private LocationService locationService;
 
     @Test
-    // GIVEN
     void shouldReturnPageOfActiveLocations() {
+        // GIVEN
         Location location = new Location();
         location.setId(1L);
         location.setCity("Zielona Góra");
+        location.setPostalCode("65-001");
         location.setStreet("Wyszyńskiego");
         location.setBuildingNumber("4");
         location.setCountryCode("PL");
-        location.setActive(true);
+        location.setTimezone("Europe/Warsaw");
+        location.setStatus(LocationStatus.ACTIVE);
 
         Pageable pageable = PageRequest.of(0, 10);
-
         Page<Location> locationPage = new PageImpl<>(List.of(location));
 
-        when(locationRepository.findByIsActiveTrue(pageable)).thenReturn(locationPage);
+        when(locationRepository.findByStatus(LocationStatus.ACTIVE, pageable)).thenReturn(locationPage);
 
         // WHEN
         Page<LocationResponse> result = locationService.getAllActiveLocations(null, pageable);
@@ -51,22 +49,24 @@ class LocationServiceTest {
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
 
-
         LocationResponse response = result.getContent().get(0);
         assertEquals(1L, response.id());
         assertEquals("Zielona Góra", response.city());
+        assertEquals("65-001", response.postalCode());
         assertEquals("Wyszyńskiego", response.street());
         assertEquals("4", response.buildingNumber());
         assertEquals("PL", response.countryCode());
+        assertEquals("Europe/Warsaw", response.timezone());
+        assertEquals(LocationStatus.ACTIVE, response.status());
 
-        verify(locationRepository, times(1)).findByIsActiveTrue(pageable);
+        verify(locationRepository, times(1)).findByStatus(LocationStatus.ACTIVE, pageable);
     }
 
     @Test
     void shouldReturnEmptyPageWhenNoActiveLocations() {
         // GIVEN
         Pageable pageable = PageRequest.of(0, 10);
-        when(locationRepository.findByIsActiveTrue(pageable)).thenReturn(Page.empty());
+        when(locationRepository.findByStatus(LocationStatus.ACTIVE, pageable)).thenReturn(Page.empty());
 
         // WHEN
         Page<LocationResponse> result = locationService.getAllActiveLocations(null, pageable);
@@ -74,7 +74,7 @@ class LocationServiceTest {
         // THEN
         assertNotNull(result);
         assertTrue(result.isEmpty());
-        verify(locationRepository, times(1)).findByIsActiveTrue(pageable);
+        verify(locationRepository, times(1)).findByStatus(LocationStatus.ACTIVE, pageable);
     }
 
     @Test
@@ -84,28 +84,29 @@ class LocationServiceTest {
         Location location = new Location();
         location.setId(1L);
         location.setCity("Zielona Góra");
+        location.setPostalCode("65-001");
         location.setStreet("Wyszyńskiego");
         location.setBuildingNumber("4");
         location.setCountryCode("PL");
-        location.setActive(true);
+        location.setTimezone("Europe/Warsaw");
+        location.setStatus(LocationStatus.ACTIVE);
 
         Page<Location> locationPage = new PageImpl<>(List.of(location));
 
-        when(locationRepository.findByIsActiveTrueAndCityContainingIgnoreCase("Zielona", pageable))
+        when(locationRepository.findByStatusAndCityContainingIgnoreCase(LocationStatus.ACTIVE, "Zielona", pageable))
                 .thenReturn(locationPage);
 
         // WHEN
         Page<LocationResponse> result = locationService.getAllActiveLocations("Zielona", pageable);
-
 
         // THEN
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         assertEquals("Zielona Góra", result.getContent().get(0).city());
 
-        verify(locationRepository, times(1)).findByIsActiveTrueAndCityContainingIgnoreCase("Zielona", pageable);
-        verify(locationRepository, never()).findByIsActiveTrue(any());
+        verify(locationRepository, times(1))
+                .findByStatusAndCityContainingIgnoreCase(LocationStatus.ACTIVE, "Zielona", pageable);
+
+        verify(locationRepository, never()).findByStatus(any(), any());
     }
-
-
 }
