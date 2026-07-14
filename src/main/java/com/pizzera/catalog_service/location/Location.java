@@ -20,7 +20,7 @@ public class Location {
     @Column(nullable = false)
     private String city;
 
-    @Column(nullable = false)
+    @Column
     private String postalCode;
 
     @Column(nullable = false)
