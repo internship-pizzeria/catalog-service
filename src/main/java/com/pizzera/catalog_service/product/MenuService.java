@@ -1,5 +1,6 @@
 package com.pizzera.catalog_service.product;
 
+import com.pizzera.catalog_service.location.LocationNotFoundException;
 import com.pizzera.catalog_service.location.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -21,7 +22,7 @@ public class MenuService {
     @Cacheable(value = "menu", key = "#locationId")
     public List<ProductResponse> getMenuForLocation(Long locationId) {
         if (!locationRepository.existsById(locationId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Location with ID " + locationId + " not found");
+            throw new LocationNotFoundException(locationId);
         }
         return productRepository.findByLocationId(locationId)
                 .stream()

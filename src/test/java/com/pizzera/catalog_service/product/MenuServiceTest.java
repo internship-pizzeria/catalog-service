@@ -1,6 +1,7 @@
 package com.pizzera.catalog_service.product;
 
 import com.pizzera.catalog_service.location.Location;
+import com.pizzera.catalog_service.location.LocationNotFoundException;
 import com.pizzera.catalog_service.location.LocationRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,13 +62,12 @@ public class MenuServiceTest {
         when(locationRepository.existsById(locationId)).thenReturn(false);
 
         // WHEN
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+        LocationNotFoundException exception = assertThrows(LocationNotFoundException.class, () -> {
             menuService.getMenuForLocation(locationId);
         });
 
         // THEN
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        assertTrue(exception.getReason().contains("Location with ID 999 not found"));
+        assertEquals("Location with ID 999 not found", exception.getMessage());
 
         verify(locationRepository, times(1)).existsById(locationId);
 
