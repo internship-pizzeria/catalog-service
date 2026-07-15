@@ -2,6 +2,7 @@ package com.pizzera.catalog_service.product;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -11,15 +12,14 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    @Transactional(readOnly = true)
+    public ProductResponse getProductByIdAndLocation(Long id, Long locationId) {
+        return productRepository.findByIdAndLocationId(id, locationId)
+                .map(ProductResponse::new)
+                .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
-    public Product getProductById(Long id) {
-        return productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found: " + id));
-    }
-
+    @Transactional
     public Product createProduct(Product product) {
         return productRepository.save(product);
     }
