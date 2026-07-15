@@ -3,8 +3,10 @@ package com.pizzera.catalog_service.product;
 import com.pizzera.catalog_service.location.Location;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -28,6 +30,9 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
+
+    @CreationTimestamp
+    private Instant createdAt;
 
     public Product(String name, String description, BigDecimal price, Location location) {
         this.name = name;
