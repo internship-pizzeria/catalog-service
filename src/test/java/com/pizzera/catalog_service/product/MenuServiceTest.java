@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,9 +36,8 @@ public class MenuServiceTest {
 
         Location dummyLocation = new Location("Zielona Góra", "65-001", "Wyszyńskiego", "4", "PL", "Europe/Warsaw");
 
-        Product pizza1 = new Product(1L, "Margherita", "Classic", new BigDecimal("25.00"), dummyLocation);
-        Product pizza2 = new Product(2L, "Pepperoni", "Spicy", new BigDecimal("30.00"), dummyLocation);
-
+        Product pizza1 = new Product(1L, "Margherita", "Classic", new BigDecimal("25.00"), dummyLocation, Instant.now());
+        Product pizza2 = new Product(2L, "Pepperoni", "Spicy", new BigDecimal("30.00"), dummyLocation, Instant.now());
         when(productRepository.findByLocationId(locationId)).thenReturn(List.of(pizza1, pizza2));
 
         // WHEN
