@@ -1,6 +1,7 @@
 package com.pizzera.catalog_service.product;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +19,7 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
-    @Transactional
+    @CacheEvict(value = "menu", key = "#product.location.id")
     public Product createProduct(Product product) {
         return productRepository.save(product);
     }
