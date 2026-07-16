@@ -1,11 +1,10 @@
 package com.pizzera.catalog_service.location;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ResponseStatusException;
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class LocationNotFoundException extends RuntimeException {
+public class LocationNotFoundException extends ResponseStatusException {
     public LocationNotFoundException(Long locationId) {
-        super("Location with ID " + locationId + " not found");
+        super(HttpStatus.NOT_FOUND, "Location with ID " + locationId + " not found");
     }
 }

@@ -75,7 +75,7 @@ class ProductServiceTest {
         });
 
         // THEN
-        assertEquals("Product with ID: 99 not found.", exception.getMessage());
+        assertEquals("Product with ID: 99 not found.", exception.getReason());
         verify(productRepository, times(1)).findByIdAndLocationId(nonExistentProductId, LOCATION_ID);
     }
 

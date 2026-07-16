@@ -8,9 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -67,7 +64,7 @@ public class MenuServiceTest {
         });
 
         // THEN
-        assertEquals("Location with ID 999 not found", exception.getMessage());
+        assertEquals("Location with ID 999 not found", exception.getReason());
 
         verify(locationRepository, times(1)).existsById(locationId);
 
