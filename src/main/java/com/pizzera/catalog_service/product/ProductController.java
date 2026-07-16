@@ -1,8 +1,7 @@
 package com.pizzera.catalog_service.product;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -10,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
 
     private final ProductService productService;
+
 
     @GetMapping("/{id}")
     public ProductResponse getProductById(@PathVariable Long id, @RequestParam Long locationId) {
