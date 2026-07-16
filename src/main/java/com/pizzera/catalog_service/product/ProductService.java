@@ -5,6 +5,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -22,5 +24,13 @@ public class ProductService {
     @CacheEvict(value = "menu", key = "#product.location.id")
     public Product createProduct(Product product) {
         return productRepository.save(product);
+    }
+
+    @Transactional(readOnly = true)
+    public List<InternalProductResponse> getProductDetails(List<Long> productIds) {
+        return productRepository.findAllById(productIds)
+                .stream()
+                .map(InternalProductResponse::new)
+                .toList();
     }
 }
