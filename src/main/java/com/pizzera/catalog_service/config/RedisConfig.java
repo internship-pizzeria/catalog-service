@@ -1,5 +1,6 @@
 package com.pizzera.catalog_service.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -11,11 +12,13 @@ import java.time.Duration;
 @Configuration
 public class RedisConfig {
 
+    @Value("${app.cache.redis.ttl-minutes:10}")
+    private long ttlInMinutes;
+
     @Bean
     public RedisCacheConfiguration cacheConfiguration() {
-
         return RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(10))
+                .entryTtl(Duration.ofMinutes(ttlInMinutes))
                 .disableCachingNullValues()
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.java()));
     }
