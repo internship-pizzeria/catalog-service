@@ -1,6 +1,8 @@
 package com.pizzera.catalog_service.location;
 
-public record LocationResponse(Long id, String city, String postalCode, String street, String buildingNumber, String countryCode, String timezone, LocationStatus status) {
+import java.io.Serializable;
+
+public record LocationResponse(Long id, String city, String postalCode, String street, String buildingNumber, String countryCode, String timezone, LocationStatus status) implements Serializable {
     public LocationResponse(Location location) {
         this(
                 location.getId(),
