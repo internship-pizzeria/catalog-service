@@ -26,4 +26,15 @@ public class LocationIngredient {
 
     @Column(nullable = false)
     private boolean available = true;
+
+    public LocationIngredient(Long locationId, Ingredient ingredient, boolean available) {
+        this.locationId = locationId;
+        this.ingredient = ingredient;
+        this.available = available;
+    }
+
+    public void toggleAvailability() {
+        this.available = !this.available;
+    }
 }
+
