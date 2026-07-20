@@ -24,7 +24,7 @@ public class MenuService {
         if (!locationRepository.existsById(locationId)) {
             throw new LocationNotFoundException(locationId);
         }
-        return productRepository.findByLocationId(locationId)
+        return productRepository.findAll()
                 .stream()
                 .map(ProductResponse::new)
                 .toList();
