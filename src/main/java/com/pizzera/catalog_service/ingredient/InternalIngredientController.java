@@ -13,7 +13,7 @@ public class InternalIngredientController {
     private final IngredientService ingredientService;
 
     @GetMapping
-    public List<LocationIngredient> getAvailability(@PathVariable Long locationId) {
+    public List<LocationIngredientResponse> getAvailability(@PathVariable Long locationId) {
         return ingredientService.getAvailabilityForLocation(locationId);
     }
 
