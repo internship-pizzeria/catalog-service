@@ -1,6 +1,5 @@
 package com.pizzera.catalog_service.ingredient;
 
-import com.pizzera.catalog_service.ingredient.Ingredient;
 import com.pizzera.catalog_service.product.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -46,7 +45,7 @@ public class IngredientService {
                 .orElseGet(() -> {
                     Ingredient ingredient = ingredientRepository.findById(ingredientId)
                             .orElseThrow(() -> new ProductNotFoundException(ingredientId));
-                    return new LocationIngredient(locationId, ingredient, false);
+                    return new LocationIngredient(locationId, ingredient, true);
                 });
 
         locationIngredient.toggleAvailability();
