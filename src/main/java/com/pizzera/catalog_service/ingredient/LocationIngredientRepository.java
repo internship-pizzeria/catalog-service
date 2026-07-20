@@ -1,4 +1,4 @@
-package com.pizzera.catalog_service.product;
+package com.pizzera.catalog_service.ingredient;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -1,7 +1,6 @@
-package com.pizzera.catalog_service.product;
+package com.pizzera.catalog_service.ingredient;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

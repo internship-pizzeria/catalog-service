@@ -1,5 +1,6 @@
 package com.pizzera.catalog_service.product;
 
+import com.pizzera.catalog_service.ingredient.Ingredient;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

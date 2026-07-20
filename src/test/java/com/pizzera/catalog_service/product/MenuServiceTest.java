@@ -2,6 +2,7 @@ package com.pizzera.catalog_service.product;
 
 import com.pizzera.catalog_service.location.LocationNotFoundException;
 import com.pizzera.catalog_service.location.LocationRepository;
+import com.pizzera.catalog_service.menu.MenuService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

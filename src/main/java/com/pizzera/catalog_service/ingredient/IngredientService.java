@@ -1,5 +1,6 @@
-package com.pizzera.catalog_service.product;
+package com.pizzera.catalog_service.ingredient;
 
+import com.pizzera.catalog_service.product.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;

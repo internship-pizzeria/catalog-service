@@ -1,5 +1,6 @@
-package com.pizzera.catalog_service.product;
+package com.pizzera.catalog_service.menu;
 
+import com.pizzera.catalog_service.product.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

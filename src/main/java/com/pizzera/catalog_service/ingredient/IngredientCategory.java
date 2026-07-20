@@ -1,4 +1,4 @@
-package com.pizzera.catalog_service.product;
+package com.pizzera.catalog_service.ingredient;
 
 public enum IngredientCategory {
     MEAT,
