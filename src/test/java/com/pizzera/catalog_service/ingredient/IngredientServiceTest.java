@@ -1,6 +1,6 @@
 package com.pizzera.catalog_service.ingredient;
 
-import com.pizzera.catalog_service.product.ProductNotFoundException;
+import com.pizzera.catalog_service.ingredient.Ingredient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -31,7 +31,7 @@ class IngredientServiceTest {
         Long locationId = 1L;
 
         Ingredient mozzarella = new Ingredient(1L, "Mozzarella", null);
-        Ingredient pepperoni = new Ingredient(2L, "Pepperoni", null );
+        Ingredient pepperoni = new Ingredient(2L, "Pepperoni", null);
 
         when(ingredientRepository.findAll()).thenReturn(List.of(mozzarella, pepperoni));
         when(locationIngredientRepository.findByLocationId(locationId)).thenReturn(List.of());
@@ -148,7 +148,7 @@ class IngredientServiceTest {
         when(ingredientRepository.findById(nonExistentIngredientId)).thenReturn(Optional.empty());
 
         // WHEN & THEN
-        assertThrows(ProductNotFoundException.class, () ->
+        assertThrows(IngredientNotFoundException.class, () ->
                 ingredientService.toggleAvailability(locationId, nonExistentIngredientId));
     }
 }

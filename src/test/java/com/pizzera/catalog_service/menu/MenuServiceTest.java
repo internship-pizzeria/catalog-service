@@ -52,7 +52,7 @@ public class MenuServiceTest {
         Product pizza2 = new Product(2L, "Pepperoni", "Spicy", new BigDecimal("30.00"), Instant.now(),
                 List.of(createProductIngredient(mozzarella), createProductIngredient(sos)));
 
-        when(productRepository.findAll()).thenReturn(List.of(pizza1, pizza2));
+        when(productRepository.findAllWithIngredients()).thenReturn(List.of(pizza1, pizza2));
 
         // WHEN
         MenuResponse result = menuService.getMenuForLocation(locationId);
@@ -79,7 +79,7 @@ public class MenuServiceTest {
         Product spicy = new Product(2L, "Pepperoni", "Spicy", new BigDecimal("30.00"), Instant.now(),
                 List.of(createProductIngredient(mozzarella), createProductIngredient(pepperoni)));
 
-        when(productRepository.findAll()).thenReturn(List.of(margherita, spicy));
+        when(productRepository.findAllWithIngredients()).thenReturn(List.of(margherita, spicy));
 
         // WHEN
         MenuResponse result = menuService.getMenuForLocation(locationId);
@@ -101,7 +101,7 @@ public class MenuServiceTest {
         Product pizza = new Product(1L, "Margherita", "Classic", new BigDecimal("25.00"), Instant.now(),
                 List.of(createProductIngredient(new Ingredient(1L, "Mozzarella", null))));
 
-        when(productRepository.findAll()).thenReturn(List.of(pizza));
+        when(productRepository.findAllWithIngredients()).thenReturn(List.of(pizza));
 
         // WHEN
         MenuResponse result = menuService.getMenuForLocation(locationId);
@@ -124,7 +124,7 @@ public class MenuServiceTest {
 
         assertEquals("Location with ID 999 not found", exception.getReason());
         verify(locationRepository, times(1)).existsById(locationId);
-        verify(productRepository, never()).findAll();
+        verify(productRepository, never()).findAllWithIngredients();
     }
 
     private ProductIngredient createProductIngredient(Ingredient ingredient) {
