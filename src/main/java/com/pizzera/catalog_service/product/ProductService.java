@@ -21,7 +21,9 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
+
     @CacheEvict(value = "menu", allEntries = true)
+    @Transactional
     public Product createProduct(Product product) {
         return productRepository.save(product);
     }
