@@ -40,7 +40,7 @@ public class MenuService {
 
         for (var product : allProducts) {
             boolean hasUnavailableIngredient = product.getIngredients().stream()
-                    .anyMatch(pi -> unavailableIds.contains(pi.getIngredient().getId()));
+                    .anyMatch(productIngredient -> unavailableIds.contains(productIngredient.getIngredient().getId()));
 
             if (hasUnavailableIngredient) {
                 totalFiltered++;

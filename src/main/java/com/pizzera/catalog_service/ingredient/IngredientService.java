@@ -24,7 +24,7 @@ public class IngredientService {
         Map<Long, Boolean> availabilityMap = locationIngredientRepository.findByLocationId(locationId)
                 .stream()
                 .collect(Collectors.toMap(
-                        li -> li.getIngredient().getId(),
+                        locationIngredient -> locationIngredient.getIngredient().getId(),
                         LocationIngredient::isAvailable
                 ));
 
