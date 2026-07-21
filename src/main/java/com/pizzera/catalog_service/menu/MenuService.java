@@ -33,7 +33,7 @@ public class MenuService {
                 locationIngredientRepository.findUnavailableIngredientIds(locationId)
         );
 
-        var allProducts = productRepository.findAll();
+        var allProducts = productRepository.findAllWithIngredients();
 
         int totalFiltered = 0;
         var availableProducts = new ArrayList<ProductResponse>();
