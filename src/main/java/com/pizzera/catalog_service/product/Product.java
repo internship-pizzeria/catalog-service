@@ -1,6 +1,5 @@
 package com.pizzera.catalog_service.product;
 
-import com.pizzera.catalog_service.location.Location;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -27,17 +26,12 @@ public class Product {
     @Column(nullable = false)
     private BigDecimal price;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id", nullable = false)
-    private Location location;
-
     @CreationTimestamp
     private Instant createdAt;
 
-    public Product(String name, String description, BigDecimal price, Location location) {
+    public Product(String name, String description, BigDecimal price) {
         this.name = name;
         this.description = description;
         this.price = price;
-        this.location = location;
     }
 }

@@ -15,13 +15,13 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     @Transactional(readOnly = true)
-    public ProductResponse getProductByIdAndLocation(Long id, Long locationId) {
-        return productRepository.findByIdAndLocationId(id, locationId)
+    public ProductResponse getProductById(Long id) {
+        return productRepository.findById(id)
                 .map(ProductResponse::new)
                 .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
-    @CacheEvict(value = "menu", key = "#product.location.id")
+    @CacheEvict(value = "menu", allEntries = true)
     public Product createProduct(Product product) {
         return productRepository.save(product);
     }

@@ -1,13 +1,16 @@
-package com.pizzera.catalog_service.product;
+package com.pizzera.catalog_service.menu;
 
-import com.pizzera.catalog_service.location.Location;
 import com.pizzera.catalog_service.location.LocationNotFoundException;
 import com.pizzera.catalog_service.location.LocationRepository;
+import com.pizzera.catalog_service.product.Product;
+import com.pizzera.catalog_service.product.ProductRepository;
+import com.pizzera.catalog_service.product.ProductResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -17,6 +20,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MenuServiceTest {
+
     @Mock
     private ProductRepository productRepository;
 
@@ -30,13 +34,11 @@ public class MenuServiceTest {
     void shouldReturnMenuForExistingLocation() {
         // GIVEN
         Long locationId = 1L;
-        when (locationRepository.existsById(locationId)).thenReturn(true);
+        when(locationRepository.existsById(locationId)).thenReturn(true);
 
-        Location dummyLocation = new Location("Zielona Góra", "65-001", "Wyszyńskiego", "4", "PL", "Europe/Warsaw");
-
-        Product pizza1 = new Product(1L, "Margherita", "Classic", new BigDecimal("25.00"), dummyLocation, Instant.now());
-        Product pizza2 = new Product(2L, "Pepperoni", "Spicy", new BigDecimal("30.00"), dummyLocation, Instant.now());
-        when(productRepository.findByLocationId(locationId)).thenReturn(List.of(pizza1, pizza2));
+        Product pizza1 = new Product(1L, "Margherita", "Classic", new BigDecimal("25.00"), Instant.now());
+        Product pizza2 = new Product(2L, "Pepperoni", "Spicy", new BigDecimal("30.00"), Instant.now());
+        when(productRepository.findAll()).thenReturn(List.of(pizza1, pizza2));
 
         // WHEN
         List<ProductResponse> result = menuService.getMenuForLocation(locationId);
@@ -49,7 +51,7 @@ public class MenuServiceTest {
         assertEquals(new BigDecimal("25.00"), result.get(0).price());
 
         verify(locationRepository, times(1)).existsById(locationId);
-        verify(productRepository, times(1)).findByLocationId(locationId);
+        verify(productRepository, times(1)).findAll();
     }
 
     @Test
@@ -67,8 +69,6 @@ public class MenuServiceTest {
         assertEquals("Location with ID 999 not found", exception.getReason());
 
         verify(locationRepository, times(1)).existsById(locationId);
-
-        verify(productRepository, never()).findByLocationId(any());
+        verify(productRepository, never()).findAll();
     }
-
 }

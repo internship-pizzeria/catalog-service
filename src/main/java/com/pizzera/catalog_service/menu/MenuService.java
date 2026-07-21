@@ -1,13 +1,13 @@
-package com.pizzera.catalog_service.product;
+package com.pizzera.catalog_service.menu;
 
 import com.pizzera.catalog_service.location.LocationNotFoundException;
 import com.pizzera.catalog_service.location.LocationRepository;
+import com.pizzera.catalog_service.product.ProductRepository;
+import com.pizzera.catalog_service.product.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class MenuService {
         if (!locationRepository.existsById(locationId)) {
             throw new LocationNotFoundException(locationId);
         }
-        return productRepository.findByLocationId(locationId)
+        return productRepository.findAll()
                 .stream()
                 .map(ProductResponse::new)
                 .toList();

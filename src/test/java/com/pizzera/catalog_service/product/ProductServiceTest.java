@@ -1,7 +1,5 @@
 package com.pizzera.catalog_service.product;
 
-import com.pizzera.catalog_service.location.Location;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,65 +17,53 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 
-    private static final Long LOCATION_ID = 100L;
-    private static final String CITY = "Zielona Góra";
-
     @Mock
     private ProductRepository productRepository;
 
     @InjectMocks
     private ProductService productService;
 
-    private Location dummyLocation;
-
-    @BeforeEach
-    void setUp() {
-        dummyLocation = new Location(CITY, "65-001", "Wyszyńskiego", "4", "PL", "Europe/Warsaw");
-        ReflectionTestUtils.setField(dummyLocation, "id", LOCATION_ID);
-    }
-
     @Test
-    void shouldReturnProductWhenFoundByIdAndLocation() {
+    void shouldReturnProductWhenFoundById() {
         // GIVEN
         Long productId = 1L;
         String productName = "Margherita";
         BigDecimal productPrice = new BigDecimal("25.00");
 
-        Product dummyProduct = new Product(productName, "Sos, ser", productPrice, dummyLocation);
+        Product dummyProduct = new Product(productName, "Sos, ser", productPrice);
         ReflectionTestUtils.setField(dummyProduct, "id", productId);
 
-        when(productRepository.findByIdAndLocationId(productId, LOCATION_ID))
+        when(productRepository.findById(productId))
                 .thenReturn(Optional.of(dummyProduct));
 
         // WHEN
-        ProductResponse result = productService.getProductByIdAndLocation(productId, LOCATION_ID);
+        ProductResponse result = productService.getProductById(productId);
 
         // THEN
         assertNotNull(result);
         assertEquals(productId, result.id());
         assertEquals(productName, result.name());
         assertEquals(productPrice, result.price());
-        assertEquals(LOCATION_ID, result.locationId());
 
-        verify(productRepository, times(1)).findByIdAndLocationId(productId, LOCATION_ID);
+        verify(productRepository, times(1)).findById(productId);
     }
 
     @Test
-    void shouldThrowExceptionWhenProductNotFoundByIdAndLocation() {
+    void shouldThrowExceptionWhenProductNotFoundById() {
         // GIVEN
         Long nonExistentProductId = 99L;
 
-        when(productRepository.findByIdAndLocationId(nonExistentProductId, LOCATION_ID))
+        when(productRepository.findById(nonExistentProductId))
                 .thenReturn(Optional.empty());
 
         // WHEN
         ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> {
-            productService.getProductByIdAndLocation(nonExistentProductId, LOCATION_ID);
+            productService.getProductById(nonExistentProductId);
         });
 
         // THEN
         assertEquals("Product with ID: " + nonExistentProductId + " not found.", exception.getReason());
-        verify(productRepository, times(1)).findByIdAndLocationId(nonExistentProductId, LOCATION_ID);
+        verify(productRepository, times(1)).findById(nonExistentProductId);
     }
 
     @Test
@@ -87,9 +73,9 @@ class ProductServiceTest {
         String newProductName = "Pepperoni";
         BigDecimal newProductPrice = new BigDecimal("32.00");
 
-        Product newProduct = new Product(newProductName, "Sos, ser, salami", newProductPrice, dummyLocation);
+        Product newProduct = new Product(newProductName, "Sos, ser, salami", newProductPrice);
 
-        Product savedProduct = new Product(newProductName, "Sos, ser, salami", newProductPrice, dummyLocation);
+        Product savedProduct = new Product(newProductName, "Sos, ser, salami", newProductPrice);
         ReflectionTestUtils.setField(savedProduct, "id", savedProductId);
 
         when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
@@ -101,7 +87,6 @@ class ProductServiceTest {
         assertNotNull(result);
         assertEquals(savedProductId, result.getId());
         assertEquals(newProductName, result.getName());
-        assertEquals(LOCATION_ID, result.getLocation().getId());
 
         verify(productRepository, times(1)).save(newProduct);
     }
@@ -121,10 +106,10 @@ class ProductServiceTest {
 
         List<Long> requestedIds = List.of(pizzaId1, pizzaId2, nonExistentId);
 
-        Product pizza1 = new Product(pizzaName1, "Sos, ser", pizzaPrice1, dummyLocation);
+        Product pizza1 = new Product(pizzaName1, "Sos, ser", pizzaPrice1);
         ReflectionTestUtils.setField(pizza1, "id", pizzaId1);
 
-        Product pizza2 = new Product(pizzaName2, "Sos, ser, salami", pizzaPrice2, dummyLocation);
+        Product pizza2 = new Product(pizzaName2, "Sos, ser, salami", pizzaPrice2);
         ReflectionTestUtils.setField(pizza2, "id", pizzaId2);
 
         when(productRepository.findAllById(requestedIds)).thenReturn(List.of(pizza1, pizza2));
