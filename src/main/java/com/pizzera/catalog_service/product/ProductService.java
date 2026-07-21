@@ -24,9 +24,11 @@ public class ProductService {
 
     @CacheEvict(value = "menu", allEntries = true)
     @Transactional
-    public Product createProduct(Product product) {
+    public Product createProduct(CreateProductRequest request) {
+        Product product = new Product(request.name(), request.description(), request.price());
         return productRepository.save(product);
     }
+
 
     @Transactional(readOnly = true)
     public List<InternalProductResponse> getProductDetails(List<Long> productIds) {
