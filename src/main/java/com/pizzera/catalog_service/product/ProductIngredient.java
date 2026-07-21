@@ -26,5 +26,8 @@ public class ProductIngredient {
     @JoinColumn(name = "ingredient_id", nullable = false)
     private Ingredient ingredient;
 
+    public ProductIngredient(Ingredient ingredient) {
+        this.ingredient = ingredient;
+    }
 
 }
