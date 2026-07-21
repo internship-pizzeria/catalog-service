@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -28,6 +29,10 @@ public class Product {
 
     @CreationTimestamp
     private Instant createdAt;
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<ProductIngredient> ingredients;
+
 
     public Product(String name, String description, BigDecimal price) {
         this.name = name;

@@ -17,7 +17,7 @@ public class MenuController {
     private final MenuService menuService;
 
     @GetMapping
-    public List<ProductResponse> getMenu(@RequestParam Long locationId) {
+    public MenuResponse getMenu(@RequestParam Long locationId) {
         return menuService.getMenuForLocation(locationId);
     }
 }

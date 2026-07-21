@@ -1,6 +1,6 @@
 package com.pizzera.catalog_service.ingredient;
 
-import com.pizzera.catalog_service.product.ProductNotFoundException;
+import com.pizzera.catalog_service.ingredient.IngredientNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class IngredientService {
         Map<Long, Boolean> availabilityMap = locationIngredientRepository.findByLocationId(locationId)
                 .stream()
                 .collect(Collectors.toMap(
-                        li -> li.getIngredient().getId(),
+                        locationIngredient -> locationIngredient.getIngredient().getId(),
                         LocationIngredient::isAvailable
                 ));
 
@@ -44,7 +44,7 @@ public class IngredientService {
                 .findByLocationIdAndIngredientId(locationId, ingredientId)
                 .orElseGet(() -> {
                     Ingredient ingredient = ingredientRepository.findById(ingredientId)
-                            .orElseThrow(() -> new ProductNotFoundException(ingredientId));
+                            .orElseThrow(() -> new IngredientNotFoundException(ingredientId));
                     return new LocationIngredient(locationId, ingredient, true);
                 });
 

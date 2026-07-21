@@ -73,7 +73,7 @@ class ProductServiceTest {
         String newProductName = "Pepperoni";
         BigDecimal newProductPrice = new BigDecimal("32.00");
 
-        Product newProduct = new Product(newProductName, "Sos, ser, salami", newProductPrice);
+        CreateProductRequest request = new CreateProductRequest(newProductName, "Sos, ser, salami", newProductPrice);
 
         Product savedProduct = new Product(newProductName, "Sos, ser, salami", newProductPrice);
         ReflectionTestUtils.setField(savedProduct, "id", savedProductId);
@@ -81,14 +81,14 @@ class ProductServiceTest {
         when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
 
         // WHEN
-        Product result = productService.createProduct(newProduct);
+        Product result = productService.createProduct(request);
 
         // THEN
         assertNotNull(result);
         assertEquals(savedProductId, result.getId());
         assertEquals(newProductName, result.getName());
 
-        verify(productRepository, times(1)).save(newProduct);
+        verify(productRepository, times(1)).save(any(Product.class));
     }
 
     @Test
