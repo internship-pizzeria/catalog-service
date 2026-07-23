@@ -22,9 +22,17 @@ public class LocationAuthFilter implements Filter {
         String path = request.getRequestURI();
 
         if (path.startsWith("/api/v1/internal/")) {
-            String userId = request.getHeader("X-User-Id");
+            String locationIdHeader = request.getHeader("LocationId");
+            String userIdHeader = request.getHeader("X-User-Id");
 
-            if (userId == null || userId.isBlank()) {
+            if (locationIdHeader == null || locationIdHeader.isBlank()) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"Missing LocationId header\"}");
+                return;
+            }
+
+            if (userIdHeader == null || userIdHeader.isBlank()) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
                 response.getWriter().write("{\"error\": \"Missing X-User-Id header\"}");
@@ -32,12 +40,14 @@ public class LocationAuthFilter implements Filter {
             }
 
             try {
-                Long locationId = Long.parseLong(userId);
+                Long locationId = Long.parseLong(locationIdHeader);
+                Long userId = Long.parseLong(userIdHeader);
                 request.setAttribute("locationId", locationId);
+                request.setAttribute("userId", userId);
             } catch (NumberFormatException e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.setContentType("application/json");
-                response.getWriter().write("{\"error\": \"Invalid X-User-Id header\"}");
+                response.getWriter().write("{\"error\": \"Invalid header value\"}");
                 return;
             }
         }

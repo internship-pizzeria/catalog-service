@@ -9,14 +9,22 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class LocationContext {
 
     public Long getCurrentLocationId() {
+        return getAttribute("locationId");
+    }
+
+    public Long getCurrentUserId() {
+        return getAttribute("userId");
+    }
+
+    private Long getAttribute(String name) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes == null) {
             return null;
         }
         HttpServletRequest request = attributes.getRequest();
-        Object locationId = request.getAttribute("locationId");
-        if (locationId instanceof Long) {
-            return (Long) locationId;
+        Object value = request.getAttribute(name);
+        if (value instanceof Long) {
+            return (Long) value;
         }
         return null;
     }
