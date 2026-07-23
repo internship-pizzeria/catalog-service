@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/internal/locations/{locationId}/ingredients")
 @RequiredArgsConstructor
-public class InternalIngredientController {
+class InternalIngredientController {
 
     private final IngredientService ingredientService;
     private final LocationContext locationContext;
@@ -23,7 +23,7 @@ public class InternalIngredientController {
     }
 
     @PatchMapping("/{ingredientId}")
-    public LocationIngredient toggleAvailability(@PathVariable Long locationId,
+    public LocationIngredientResponse toggleAvailability(@PathVariable Long locationId,
                                                  @PathVariable Long ingredientId) {
         validateAccess(locationId);
         return ingredientService.toggleAvailability(locationId, ingredientId);

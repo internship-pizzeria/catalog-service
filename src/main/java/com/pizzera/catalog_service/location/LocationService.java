@@ -14,14 +14,33 @@ public class LocationService {
     private final LocationRepository locationRepository;
 
     @Transactional(readOnly = true)
+    public boolean existsById(Long id) {
+        return locationRepository.existsById(id);
+    }
+
+    public void ensureExists(Long id) {
+        if (!locationRepository.existsById(id)) {
+            throw new LocationNotFoundException(id);
+        }
+    }
+
+    @Transactional(readOnly = true)
     @Cacheable(value = "locations")
     public Page<LocationResponse> getAllActiveLocations(String city, Pageable pageable) {
         if (city != null && !city.isBlank()) {
             String trimmedCity = city.trim();
             return locationRepository.findByStatusAndCityContainingIgnoreCase(LocationStatus.ACTIVE, trimmedCity, pageable)
-                    .map(LocationResponse::new);
+                    .map(this::toResponse);
         }
         return locationRepository.findByStatus(LocationStatus.ACTIVE, pageable)
-                .map(LocationResponse::new);
+                .map(this::toResponse);
+    }
+
+    private LocationResponse toResponse(Location location) {
+        return new LocationResponse(
+                location.getId(), location.getCity(), location.getPostalCode(),
+                location.getStreet(), location.getBuildingNumber(), location.getCountryCode(),
+                location.getTimezone(), location.getStatus()
+        );
     }
 }

@@ -1,51 +1,48 @@
 package com.pizzera.catalog_service.menu;
 
-import com.pizzera.catalog_service.ingredient.LocationIngredientRepository;
-import com.pizzera.catalog_service.location.LocationNotFoundException;
-import com.pizzera.catalog_service.location.LocationRepository;
-import com.pizzera.catalog_service.product.ProductRepository;
+import com.pizzera.catalog_service.ingredient.IngredientService;
+import com.pizzera.catalog_service.location.LocationService;
 import com.pizzera.catalog_service.product.ProductResponse;
+import com.pizzera.catalog_service.product.ProductService;
+import com.pizzera.catalog_service.product.ProductWithIngredientsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class MenuService {
 
-    private final ProductRepository productRepository;
-    private final LocationRepository locationRepository;
-    private final LocationIngredientRepository locationIngredientRepository;
+    private final ProductService productService;
+    private final LocationService locationService;
+    private final IngredientService ingredientService;
 
     @Transactional(readOnly = true)
     @Cacheable(value = "menu", key = "#locationId")
     public MenuResponse getMenuForLocation(Long locationId) {
-        if (!locationRepository.existsById(locationId)) {
-            throw new LocationNotFoundException(locationId);
-        }
+        locationService.ensureExists(locationId);
 
-        Set<Long> unavailableIds = new HashSet<>(
-                locationIngredientRepository.findUnavailableIngredientIds(locationId)
-        );
+        Set<Long> unavailableIds = ingredientService.findUnavailableIngredientIds(locationId);
 
-        var allProducts = productRepository.findAllWithIngredients();
+        var allProducts = productService.findAllWithIngredients();
 
         int totalFiltered = 0;
         var availableProducts = new ArrayList<ProductResponse>();
 
-        for (var product : allProducts) {
-            boolean hasUnavailableIngredient = product.getIngredients().stream()
-                    .anyMatch(productIngredient -> unavailableIds.contains(productIngredient.getIngredient().getId()));
+        for (ProductWithIngredientsResponse product : allProducts) {
+            boolean hasUnavailableIngredient = product.ingredientIds().stream()
+                    .anyMatch(unavailableIds::contains);
 
             if (hasUnavailableIngredient) {
                 totalFiltered++;
             } else {
-                availableProducts.add(new ProductResponse(product));
+                availableProducts.add(new ProductResponse(
+                        product.id(), product.name(), product.description(), product.price()
+                ));
             }
         }
 
