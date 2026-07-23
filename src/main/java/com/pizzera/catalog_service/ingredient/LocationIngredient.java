@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "location_ingredients")
+@Table(name = "location_ingredients",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"location_id", "ingredient_id"}))
 class LocationIngredient {
 
     @Id

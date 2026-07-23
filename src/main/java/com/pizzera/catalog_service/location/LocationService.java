@@ -26,13 +26,17 @@ public class LocationService {
 
     @Transactional(readOnly = true)
     @Cacheable(value = "locations")
-    public Page<LocationResponse> getAllActiveLocations(String city, Pageable pageable) {
+    public LocationPageResponse getAllActiveLocations(String city, Pageable pageable) {
+        Page<LocationResponse> page;
         if (city != null && !city.isBlank()) {
             String trimmedCity = city.trim();
-            return locationRepository.findByStatusAndCityContainingIgnoreCase(LocationStatus.ACTIVE, trimmedCity, pageable)
+            page = locationRepository.findByStatusAndCityContainingIgnoreCase(LocationStatus.ACTIVE, trimmedCity, pageable)
+                    .map(LocationResponse::from);
+        } else {
+            page = locationRepository.findByStatus(LocationStatus.ACTIVE, pageable)
                     .map(LocationResponse::from);
         }
-        return locationRepository.findByStatus(LocationStatus.ACTIVE, pageable)
-                .map(LocationResponse::from);
+
+        return LocationPageResponse.from(page);
     }
 }

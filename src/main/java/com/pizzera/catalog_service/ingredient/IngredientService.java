@@ -26,7 +26,8 @@ public class IngredientService {
                 .stream()
                 .collect(Collectors.toMap(
                         locationIngredient -> locationIngredient.getIngredient().getId(),
-                        LocationIngredient::isAvailable
+                        LocationIngredient::isAvailable,
+                        (existing, replacement) -> existing
                 ));
 
         return allIngredients.stream()

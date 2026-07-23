@@ -2,7 +2,6 @@ package com.pizzera.catalog_service.location;
 
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +18,7 @@ class LocationController {
     private final LocationService locationService;
 
     @GetMapping
-    public Page<LocationResponse> getAllActiveLocations(
+    public LocationPageResponse getAllActiveLocations(
             @RequestParam(required = false) String city,
             @PageableDefault(size = 20) Pageable pageable) {
         return locationService.getAllActiveLocations(city, pageable);

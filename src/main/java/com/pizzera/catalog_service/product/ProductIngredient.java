@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
-@Table(name = "product_ingredients")
+@Table(name = "product_ingredients",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "ingredient_id"}))
 class ProductIngredient {
 
     @Id

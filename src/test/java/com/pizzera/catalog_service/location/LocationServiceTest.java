@@ -42,12 +42,12 @@ class LocationServiceTest {
 
         when(locationRepository.findByStatus(LocationStatus.ACTIVE, pageable)).thenReturn(locationPage);
 
-        Page<LocationResponse> result = locationService.getAllActiveLocations(null, pageable);
+        LocationPageResponse result = locationService.getAllActiveLocations(null, pageable);
 
         assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
+        assertEquals(1, result.totalElements());
 
-        LocationResponse response = result.getContent().get(0);
+        LocationResponse response = result.content().get(0);
         assertEquals(1L, response.id());
         assertEquals("Zielona Góra", response.city());
         assertEquals("65-001", response.postalCode());
@@ -65,10 +65,10 @@ class LocationServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         when(locationRepository.findByStatus(LocationStatus.ACTIVE, pageable)).thenReturn(Page.empty());
 
-        Page<LocationResponse> result = locationService.getAllActiveLocations(null, pageable);
+        LocationPageResponse result = locationService.getAllActiveLocations(null, pageable);
 
         assertNotNull(result);
-        assertTrue(result.isEmpty());
+        assertEquals(0, result.totalElements());
         verify(locationRepository, times(1)).findByStatus(LocationStatus.ACTIVE, pageable);
     }
 
@@ -89,11 +89,11 @@ class LocationServiceTest {
         when(locationRepository.findByStatusAndCityContainingIgnoreCase(LocationStatus.ACTIVE, "Zielona", pageable))
                 .thenReturn(locationPage);
 
-        Page<LocationResponse> result = locationService.getAllActiveLocations("Zielona", pageable);
+        LocationPageResponse result = locationService.getAllActiveLocations("Zielona", pageable);
 
         assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        assertEquals("Zielona Góra", result.getContent().get(0).city());
+        assertEquals(1, result.totalElements());
+        assertEquals("Zielona Góra", result.content().get(0).city());
 
         verify(locationRepository, times(1))
                 .findByStatusAndCityContainingIgnoreCase(LocationStatus.ACTIVE, "Zielona", pageable);
