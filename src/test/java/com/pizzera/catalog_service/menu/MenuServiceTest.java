@@ -4,6 +4,7 @@ import com.pizzera.catalog_service.ingredient.IngredientService;
 import com.pizzera.catalog_service.location.LocationNotFoundException;
 import com.pizzera.catalog_service.location.LocationService;
 import com.pizzera.catalog_service.product.ProductService;
+import com.pizzera.catalog_service.product.ProductResponse;
 import com.pizzera.catalog_service.product.ProductWithIngredientsResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +54,8 @@ public class MenuServiceTest {
 
         // THEN
         assertEquals(2, result.products().size());
-        assertEquals(0, result.totalFiltered());
+        assertEquals(0, result.unavailableCount());
+        assertTrue(result.products().stream().allMatch(ProductResponse::available));
     }
 
     @Test
@@ -74,9 +76,12 @@ public class MenuServiceTest {
         MenuResponse result = menuService.getMenuForLocation(locationId);
 
         // THEN
-        assertEquals(1, result.products().size());
+        assertEquals(2, result.products().size());
         assertEquals("Margherita", result.products().getFirst().name());
-        assertEquals(1, result.totalFiltered());
+        assertTrue(result.products().getFirst().available());
+        assertEquals("Pepperoni", result.products().get(1).name());
+        assertFalse(result.products().get(1).available());
+        assertEquals(1, result.unavailableCount());
     }
 
     @Test
@@ -96,7 +101,8 @@ public class MenuServiceTest {
 
         // THEN
         assertEquals(1, result.products().size());
-        assertEquals(0, result.totalFiltered());
+        assertEquals(0, result.unavailableCount());
+        assertTrue(result.products().getFirst().available());
     }
 
     @Test
