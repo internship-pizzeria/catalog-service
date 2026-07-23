@@ -10,7 +10,7 @@ import java.util.Optional;
 
 
 @Repository
-public interface LocationIngredientRepository extends JpaRepository<LocationIngredient, Long> {
+interface LocationIngredientRepository extends JpaRepository<LocationIngredient, Long> {
 
     List<LocationIngredient> findByLocationId(Long locationId);
 

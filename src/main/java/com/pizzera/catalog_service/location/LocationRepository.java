@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface LocationRepository extends JpaRepository<Location, Long> {
+interface LocationRepository extends JpaRepository<Location, Long> {
     Page<Location> findByStatus(LocationStatus status, Pageable pageable);
 
     Page<Location> findByStatusAndCityContainingIgnoreCase(LocationStatus status, String city, Pageable pageable);

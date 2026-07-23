@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "location_ingredients")
-public class LocationIngredient {
+class LocationIngredient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

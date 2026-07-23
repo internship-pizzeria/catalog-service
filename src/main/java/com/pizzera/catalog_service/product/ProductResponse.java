@@ -4,12 +4,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 public record ProductResponse(Long id, String name, String description, BigDecimal price) implements Serializable {
-    public ProductResponse(Product product) {
-        this(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice()
+    static ProductResponse from(Product product) {
+        return new ProductResponse(
+                product.getId(), product.getName(), product.getDescription(), product.getPrice()
         );
     }
 }

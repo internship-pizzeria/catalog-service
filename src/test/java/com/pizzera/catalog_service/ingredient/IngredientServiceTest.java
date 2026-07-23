@@ -84,10 +84,11 @@ class IngredientServiceTest {
                 .thenAnswer(inv -> inv.getArgument(0));
 
         // WHEN
-        LocationIngredient result = ingredientService.toggleAvailability(locationId, ingredientId);
+        LocationIngredientResponse result = ingredientService.toggleAvailability(locationId, ingredientId);
 
         // THEN
-        assertFalse(result.isAvailable());
+        assertFalse(result.available());
+        assertEquals("Mozzarella", result.name());
         verify(locationIngredientRepository).save(any(LocationIngredient.class));
         verify(ingredientRepository, never()).findById(any());
     }
@@ -107,10 +108,10 @@ class IngredientServiceTest {
                 .thenAnswer(inv -> inv.getArgument(0));
 
         // WHEN
-        LocationIngredient result = ingredientService.toggleAvailability(locationId, ingredientId);
+        LocationIngredientResponse result = ingredientService.toggleAvailability(locationId, ingredientId);
 
         // THEN
-        assertTrue(result.isAvailable());
+        assertTrue(result.available());
     }
 
     @Test
@@ -128,11 +129,10 @@ class IngredientServiceTest {
                 .thenAnswer(inv -> inv.getArgument(0));
 
         // WHEN
-        LocationIngredient result = ingredientService.toggleAvailability(locationId, ingredientId);
+        LocationIngredientResponse result = ingredientService.toggleAvailability(locationId, ingredientId);
 
         // THEN
-        assertFalse(result.isAvailable());
-        assertEquals(locationId, result.getLocationId());
+        assertFalse(result.available());
         verify(ingredientRepository).findById(ingredientId);
         verify(locationIngredientRepository).save(any(LocationIngredient.class));
     }

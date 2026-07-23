@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
-public class RedisConfig {
+class RedisConfig {
 
     @Value("${app.cache.redis.menu-ttl-minutes:5}")
     private long menuTtlMinutes;

@@ -81,12 +81,13 @@ class ProductServiceTest {
         when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
 
         // WHEN
-        Product result = productService.createProduct(request);
+        ProductResponse result = productService.createProduct(request);
 
         // THEN
         assertNotNull(result);
-        assertEquals(savedProductId, result.getId());
-        assertEquals(newProductName, result.getName());
+        assertEquals(savedProductId, result.id());
+        assertEquals(newProductName, result.name());
+        assertEquals(newProductPrice, result.price());
 
         verify(productRepository, times(1)).save(any(Product.class));
     }

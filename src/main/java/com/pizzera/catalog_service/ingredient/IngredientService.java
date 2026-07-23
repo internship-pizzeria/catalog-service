@@ -1,13 +1,14 @@
 package com.pizzera.catalog_service.ingredient;
 
-import com.pizzera.catalog_service.ingredient.IngredientNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,9 +38,14 @@ public class IngredientService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public Set<Long> findUnavailableIngredientIds(Long locationId) {
+        return new HashSet<>(locationIngredientRepository.findUnavailableIngredientIds(locationId));
+    }
+
     @CacheEvict(value = "menu", key = "#locationId")
     @Transactional
-    public LocationIngredient toggleAvailability(Long locationId, Long ingredientId) {
+    public LocationIngredientResponse toggleAvailability(Long locationId, Long ingredientId) {
         LocationIngredient locationIngredient = locationIngredientRepository
                 .findByLocationIdAndIngredientId(locationId, ingredientId)
                 .orElseGet(() -> {
@@ -49,6 +55,6 @@ public class IngredientService {
                 });
 
         locationIngredient.toggleAvailability();
-        return locationIngredientRepository.save(locationIngredient);
+        return LocationIngredientResponse.from(locationIngredientRepository.save(locationIngredient));
     }
 }
