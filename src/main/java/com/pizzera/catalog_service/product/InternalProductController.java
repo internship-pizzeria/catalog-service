@@ -1,6 +1,9 @@
 package com.pizzera.catalog_service.product;
 
 import com.pizzera.catalog_service.security.LocationContext;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,13 +17,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/internal/products")
 @RequiredArgsConstructor
+@Tag(name = "Internal Products", description = "Internal product endpoints for service-to-service communication (requires LocationId and X-User-Id headers)")
 class InternalProductController {
 
     private final ProductService productService;
     private final LocationContext locationContext;
 
     @PostMapping("/details")
-    public List<InternalProductResponse> getProductDetails(@RequestBody List<Long> productIds) {
+    @Operation(summary = "Batch fetch product details", description = "Returns basic product information (id, name, price) for a list of product IDs")
+    public List<InternalProductResponse> getProductDetails(
+            @Parameter(description = "List of product IDs to fetch") @RequestBody List<Long> productIds) {
         validateAccess();
         return productService.getProductDetails(productIds);
     }

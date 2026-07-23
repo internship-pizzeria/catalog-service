@@ -1,5 +1,8 @@
 package com.pizzera.catalog_service.menu;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,12 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/menu")
 @RequiredArgsConstructor
+@Tag(name = "Menu", description = "Location-aware menu with ingredient availability")
 class MenuController {
 
     private final MenuService menuService;
 
     @GetMapping
-    public MenuResponse getMenu(@RequestParam Long locationId) {
+    @Operation(summary = "Get menu for location", description = "Returns all products with their availability status for a specific location. Products with unavailable ingredients are marked as unavailable.")
+    public MenuResponse getMenu(
+            @Parameter(description = "Location ID", example = "1", required = true) @RequestParam Long locationId) {
         return menuService.getMenuForLocation(locationId);
     }
 }
