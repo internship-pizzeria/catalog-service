@@ -17,7 +17,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     public ProductResponse getProductById(Long id) {
         return productRepository.findById(id)
-                .map(this::toResponse)
+                .map(ProductResponse::from)
                 .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
@@ -26,15 +26,14 @@ public class ProductService {
     @Transactional
     public ProductResponse createProduct(CreateProductRequest request) {
         Product product = new Product(request.name(), request.description(), request.price());
-        Product saved = productRepository.save(product);
-        return toResponse(saved);
+        return ProductResponse.from(productRepository.save(product));
     }
 
 
     @Transactional(readOnly = true)
     public List<ProductWithIngredientsResponse> findAllWithIngredients() {
         return productRepository.findAllWithIngredients().stream()
-                .map(this::toResponseWithIngredients)
+                .map(ProductWithIngredientsResponse::from)
                 .toList();
     }
 
@@ -42,26 +41,7 @@ public class ProductService {
     public List<InternalProductResponse> getProductDetails(List<Long> productIds) {
         return productRepository.findAllById(productIds)
                 .stream()
-                .map(this::toInternalResponse)
+                .map(InternalProductResponse::from)
                 .toList();
-    }
-
-    private ProductResponse toResponse(Product product) {
-        return new ProductResponse(
-                product.getId(), product.getName(), product.getDescription(), product.getPrice()
-        );
-    }
-
-    private InternalProductResponse toInternalResponse(Product product) {
-        return new InternalProductResponse(product.getId(), product.getName(), product.getPrice());
-    }
-
-    private ProductWithIngredientsResponse toResponseWithIngredients(Product product) {
-        return new ProductWithIngredientsResponse(
-                product.getId(), product.getName(), product.getDescription(), product.getPrice(),
-                product.getIngredients().stream()
-                        .map(pi -> pi.getIngredient().getId())
-                        .toList()
-        );
     }
 }

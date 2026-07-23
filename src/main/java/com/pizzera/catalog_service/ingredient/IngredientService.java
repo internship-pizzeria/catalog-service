@@ -55,9 +55,6 @@ public class IngredientService {
                 });
 
         locationIngredient.toggleAvailability();
-        LocationIngredient saved = locationIngredientRepository.save(locationIngredient);
-        return new LocationIngredientResponse(
-                saved.getId(), saved.getIngredient().getName(), saved.isAvailable()
-        );
+        return LocationIngredientResponse.from(locationIngredientRepository.save(locationIngredient));
     }
 }

@@ -11,4 +11,12 @@ public record ProductWithIngredientsResponse(
         BigDecimal price,
         List<Long> ingredientIds
 ) implements Serializable {
+    static ProductWithIngredientsResponse from(Product product) {
+        return new ProductWithIngredientsResponse(
+                product.getId(), product.getName(), product.getDescription(), product.getPrice(),
+                product.getIngredients().stream()
+                        .map(pi -> pi.getIngredient().getId())
+                        .toList()
+        );
+    }
 }

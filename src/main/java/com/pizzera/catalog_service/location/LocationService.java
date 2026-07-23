@@ -30,17 +30,9 @@ public class LocationService {
         if (city != null && !city.isBlank()) {
             String trimmedCity = city.trim();
             return locationRepository.findByStatusAndCityContainingIgnoreCase(LocationStatus.ACTIVE, trimmedCity, pageable)
-                    .map(this::toResponse);
+                    .map(LocationResponse::from);
         }
         return locationRepository.findByStatus(LocationStatus.ACTIVE, pageable)
-                .map(this::toResponse);
-    }
-
-    private LocationResponse toResponse(Location location) {
-        return new LocationResponse(
-                location.getId(), location.getCity(), location.getPostalCode(),
-                location.getStreet(), location.getBuildingNumber(), location.getCountryCode(),
-                location.getTimezone(), location.getStatus()
-        );
+                .map(LocationResponse::from);
     }
 }
