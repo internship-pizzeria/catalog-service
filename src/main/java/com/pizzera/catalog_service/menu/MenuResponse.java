@@ -7,6 +7,5 @@ import java.util.List;
 
 public record MenuResponse(
         List<ProductResponse> products,
-        int totalFiltered
-) implements Serializable {
-}
+        int unavailableCount
+) implements Serializable {}

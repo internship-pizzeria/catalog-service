@@ -30,22 +30,20 @@ public class MenuService {
 
         var allProducts = productService.findAllWithIngredients();
 
-        int totalFiltered = 0;
-        var availableProducts = new ArrayList<ProductResponse>();
+        int unavailableCount = 0;
+        var products = new ArrayList<ProductResponse>();
 
         for (ProductWithIngredientsResponse product : allProducts) {
             boolean hasUnavailableIngredient = product.ingredientIds().stream()
                     .anyMatch(unavailableIds::contains);
 
+            products.add(ProductResponse.from(product, !hasUnavailableIngredient));
+
             if (hasUnavailableIngredient) {
-                totalFiltered++;
-            } else {
-                availableProducts.add(new ProductResponse(
-                        product.id(), product.name(), product.description(), product.price()
-                ));
+                unavailableCount++;
             }
         }
 
-        return new MenuResponse(availableProducts, totalFiltered);
+        return new MenuResponse(products, unavailableCount);
     }
 }
