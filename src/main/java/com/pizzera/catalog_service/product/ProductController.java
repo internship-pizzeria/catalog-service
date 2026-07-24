@@ -13,8 +13,10 @@ class ProductController {
     private final ProductService productService;
 
     @GetMapping("/{id}")
-    public ProductResponse getProductById(@PathVariable Long id) {
-        return productService.getProductById(id);
+    public ProductResponse getProductById(
+            @PathVariable Long id,
+            @RequestParam(required = false) Long locationId) {
+        return productService.getProductById(id, locationId);
     }
 
     @PostMapping
