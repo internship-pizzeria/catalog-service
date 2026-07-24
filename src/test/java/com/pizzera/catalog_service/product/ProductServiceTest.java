@@ -1,5 +1,8 @@
 package com.pizzera.catalog_service.product;
 
+import com.pizzera.catalog_service.ingredient.Ingredient;
+import com.pizzera.catalog_service.ingredient.IngredientCategory;
+import com.pizzera.catalog_service.ingredient.IngredientService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,6 +13,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -19,6 +23,9 @@ class ProductServiceTest {
 
     @Mock
     private ProductRepository productRepository;
+
+    @Mock
+    private IngredientService ingredientService;
 
     @InjectMocks
     private ProductService productService;
@@ -37,15 +44,70 @@ class ProductServiceTest {
                 .thenReturn(Optional.of(dummyProduct));
 
         // WHEN
-        ProductResponse result = productService.getProductById(productId);
+        ProductResponse result = productService.getProductById(productId, null);
 
         // THEN
         assertNotNull(result);
         assertEquals(productId, result.id());
         assertEquals(productName, result.name());
         assertEquals(productPrice, result.price());
+        assertTrue(result.available());
 
         verify(productRepository, times(1)).findById(productId);
+    }
+
+    @Test
+    void shouldReturnProductAsAvailableWhenLocationIdProvidedAndAllIngredientsAvailable() {
+        // GIVEN
+        Long productId = 1L;
+        Long locationId = 10L;
+
+        Ingredient ingredient = new Ingredient(1L, "Ser", IngredientCategory.CHEESE);
+        ProductIngredient productIngredient = new ProductIngredient(ingredient);
+
+        Product product = new Product("Margherita", "Sos, ser", new BigDecimal("25.00"));
+        ReflectionTestUtils.setField(product, "id", productId);
+        ReflectionTestUtils.setField(product, "ingredients", List.of(productIngredient));
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(ingredientService.findUnavailableIngredientIds(locationId)).thenReturn(Set.of(99L));
+
+        // WHEN
+        ProductResponse result = productService.getProductById(productId, locationId);
+
+        // THEN
+        assertNotNull(result);
+        assertTrue(result.available());
+
+        verify(productRepository).findById(productId);
+        verify(ingredientService).findUnavailableIngredientIds(locationId);
+    }
+
+    @Test
+    void shouldReturnProductAsUnavailableWhenLocationIdProvidedAndIngredientUnavailable() {
+        // GIVEN
+        Long productId = 1L;
+        Long locationId = 10L;
+
+        Ingredient ingredient = new Ingredient(1L, "Ser", IngredientCategory.CHEESE);
+        ProductIngredient productIngredient = new ProductIngredient(ingredient);
+
+        Product product = new Product("Margherita", "Sos, ser", new BigDecimal("25.00"));
+        ReflectionTestUtils.setField(product, "id", productId);
+        ReflectionTestUtils.setField(product, "ingredients", List.of(productIngredient));
+
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(ingredientService.findUnavailableIngredientIds(locationId)).thenReturn(Set.of(1L));
+
+        // WHEN
+        ProductResponse result = productService.getProductById(productId, locationId);
+
+        // THEN
+        assertNotNull(result);
+        assertFalse(result.available());
+
+        verify(productRepository).findById(productId);
+        verify(ingredientService).findUnavailableIngredientIds(locationId);
     }
 
     @Test
@@ -58,7 +120,7 @@ class ProductServiceTest {
 
         // WHEN
         ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> {
-            productService.getProductById(nonExistentProductId);
+            productService.getProductById(nonExistentProductId, null);
         });
 
         // THEN
