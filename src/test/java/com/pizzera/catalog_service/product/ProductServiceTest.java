@@ -166,19 +166,28 @@ class ProductServiceTest {
         BigDecimal pizzaPrice2 = new BigDecimal("32.00");
 
         Long nonExistentId = 999L;
+        Long locationId = 10L;
 
         List<Long> requestedIds = List.of(pizzaId1, pizzaId2, nonExistentId);
 
+        Ingredient ingredient1 = new Ingredient(1L, "Ser", IngredientCategory.CHEESE);
+        Ingredient ingredient2 = new Ingredient(2L, "Sos", IngredientCategory.SAUCE);
+        ProductIngredient pi1 = new ProductIngredient(ingredient1);
+        ProductIngredient pi2 = new ProductIngredient(ingredient2);
+
         Product pizza1 = new Product(pizzaName1, "Sos, ser", pizzaPrice1);
         ReflectionTestUtils.setField(pizza1, "id", pizzaId1);
+        ReflectionTestUtils.setField(pizza1, "ingredients", List.of(pi1, pi2));
 
         Product pizza2 = new Product(pizzaName2, "Sos, ser, salami", pizzaPrice2);
         ReflectionTestUtils.setField(pizza2, "id", pizzaId2);
+        ReflectionTestUtils.setField(pizza2, "ingredients", List.of(pi1));
 
         when(productRepository.findAllById(requestedIds)).thenReturn(List.of(pizza1, pizza2));
+        when(ingredientService.findUnavailableIngredientIds(locationId)).thenReturn(Set.of(99L));
 
         // WHEN
-        List<InternalProductResponse> result = productService.getProductDetails(requestedIds);
+        List<InternalProductResponse> result = productService.getProductDetails(requestedIds, locationId);
 
         // THEN
         assertNotNull(result);
@@ -188,12 +197,15 @@ class ProductServiceTest {
         assertEquals(pizzaId1, response1.id());
         assertEquals(pizzaName1, response1.name());
         assertEquals(pizzaPrice1, response1.price());
+        assertTrue(response1.available());
 
         InternalProductResponse response2 = result.get(1);
         assertEquals(pizzaId2, response2.id());
         assertEquals(pizzaName2, response2.name());
         assertEquals(pizzaPrice2, response2.price());
+        assertTrue(response2.available());
 
         verify(productRepository, times(1)).findAllById(requestedIds);
+        verify(ingredientService).findUnavailableIngredientIds(locationId);
     }
 }

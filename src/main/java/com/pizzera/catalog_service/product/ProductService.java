@@ -50,10 +50,17 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<InternalProductResponse> getProductDetails(List<Long> productIds) {
-        return productRepository.findAllById(productIds)
-                .stream()
-                .map(InternalProductResponse::from)
+    public List<InternalProductResponse> getProductDetails(List<Long> productIds, Long locationId) {
+        Set<Long> unavailableIds = locationId != null
+                ? ingredientService.findUnavailableIngredientIds(locationId)
+                : Set.of();
+
+        return productRepository.findAllById(productIds).stream()
+                .map(product -> {
+                    boolean hasUnavailable = product.getIngredients().stream()
+                            .anyMatch(pi -> unavailableIds.contains(pi.getIngredient().getId()));
+                    return InternalProductResponse.from(product, !hasUnavailable);
+                })
                 .toList();
     }
 }
