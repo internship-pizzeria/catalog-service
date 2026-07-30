@@ -40,7 +40,7 @@ class ProductServiceTest {
         Product dummyProduct = new Product(productName, "Sos, ser", productPrice);
         ReflectionTestUtils.setField(dummyProduct, "id", productId);
 
-        when(productRepository.findById(productId))
+        when(productRepository.findByIdWithIngredients(productId))
                 .thenReturn(Optional.of(dummyProduct));
 
         // WHEN
@@ -53,7 +53,7 @@ class ProductServiceTest {
         assertEquals(productPrice, result.price());
         assertTrue(result.available());
 
-        verify(productRepository, times(1)).findById(productId);
+        verify(productRepository, times(1)).findByIdWithIngredients(productId);
     }
 
     @Test
@@ -69,7 +69,7 @@ class ProductServiceTest {
         ReflectionTestUtils.setField(product, "id", productId);
         ReflectionTestUtils.setField(product, "ingredients", List.of(productIngredient));
 
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(productRepository.findByIdWithIngredients(productId)).thenReturn(Optional.of(product));
         when(ingredientService.findUnavailableIngredientIds(locationId)).thenReturn(Set.of(99L));
 
         // WHEN
@@ -79,7 +79,7 @@ class ProductServiceTest {
         assertNotNull(result);
         assertTrue(result.available());
 
-        verify(productRepository).findById(productId);
+        verify(productRepository).findByIdWithIngredients(productId);
         verify(ingredientService).findUnavailableIngredientIds(locationId);
     }
 
@@ -96,7 +96,7 @@ class ProductServiceTest {
         ReflectionTestUtils.setField(product, "id", productId);
         ReflectionTestUtils.setField(product, "ingredients", List.of(productIngredient));
 
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(productRepository.findByIdWithIngredients(productId)).thenReturn(Optional.of(product));
         when(ingredientService.findUnavailableIngredientIds(locationId)).thenReturn(Set.of(1L));
 
         // WHEN
@@ -106,7 +106,7 @@ class ProductServiceTest {
         assertNotNull(result);
         assertFalse(result.available());
 
-        verify(productRepository).findById(productId);
+        verify(productRepository).findByIdWithIngredients(productId);
         verify(ingredientService).findUnavailableIngredientIds(locationId);
     }
 
@@ -115,7 +115,7 @@ class ProductServiceTest {
         // GIVEN
         Long nonExistentProductId = 99L;
 
-        when(productRepository.findById(nonExistentProductId))
+        when(productRepository.findByIdWithIngredients(nonExistentProductId))
                 .thenReturn(Optional.empty());
 
         // WHEN
@@ -125,7 +125,7 @@ class ProductServiceTest {
 
         // THEN
         assertEquals("Product with ID: " + nonExistentProductId + " not found.", exception.getReason());
-        verify(productRepository, times(1)).findById(nonExistentProductId);
+        verify(productRepository, times(1)).findByIdWithIngredients(nonExistentProductId);
     }
 
     @Test
@@ -183,7 +183,7 @@ class ProductServiceTest {
         ReflectionTestUtils.setField(pizza2, "id", pizzaId2);
         ReflectionTestUtils.setField(pizza2, "ingredients", List.of(pi1));
 
-        when(productRepository.findAllById(requestedIds)).thenReturn(List.of(pizza1, pizza2));
+        when(productRepository.findAllByIdWithIngredients(requestedIds)).thenReturn(List.of(pizza1, pizza2));
         when(ingredientService.findUnavailableIngredientIds(locationId)).thenReturn(Set.of(99L));
 
         // WHEN
@@ -205,7 +205,7 @@ class ProductServiceTest {
         assertEquals(pizzaPrice2, response2.price());
         assertTrue(response2.available());
 
-        verify(productRepository, times(1)).findAllById(requestedIds);
+        verify(productRepository, times(1)).findAllByIdWithIngredients(requestedIds);
         verify(ingredientService).findUnavailableIngredientIds(locationId);
     }
 }

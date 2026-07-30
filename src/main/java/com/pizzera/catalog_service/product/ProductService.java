@@ -19,7 +19,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public ProductResponse getProductById(Long id, Long locationId) {
-        Product product = productRepository.findById(id)
+        Product product = productRepository.findByIdWithIngredients(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
 
         boolean available = true;
@@ -55,7 +55,7 @@ public class ProductService {
                 ? ingredientService.findUnavailableIngredientIds(locationId)
                 : Set.of();
 
-        return productRepository.findAllById(productIds).stream()
+        return productRepository.findAllByIdWithIngredients(productIds).stream()
                 .map(product -> {
                     boolean hasUnavailable = product.getIngredients().stream()
                             .anyMatch(pi -> unavailableIds.contains(pi.getIngredient().getId()));
