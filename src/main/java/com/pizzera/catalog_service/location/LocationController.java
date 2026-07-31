@@ -2,6 +2,8 @@ package com.pizzera.catalog_service.location;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -24,16 +26,22 @@ class LocationController {
 
     @GetMapping
     @Operation(summary = "List active locations", description = "Returns a paginated list of all active restaurant locations, optionally filtered by city name")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Paginated list of active locations")
+    })
     public LocationPageResponse getAllActiveLocations(
-            @Parameter(description = "City name to filter locations by") @RequestParam(required = false) String city,
+            @Parameter(description = "City name to filter locations by", example = "Kraków") @RequestParam(required = false) String city,
             @PageableDefault(size = 20) Pageable pageable) {
         return locationService.getAllActiveLocations(city, pageable);
     }
 
     @GetMapping("/batch")
     @Operation(summary = "Get locations by IDs", description = "Returns locations for the given list of IDs (internal service-to-service communication)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Locations matching the requested IDs")
+    })
     public List<LocationResponse> getLocationsByIds(
-            @Parameter(description = "List of location IDs", example = "1,2,3") @RequestParam List<Long> ids) {
+            @Parameter(description = "List of location IDs", example = "1,2,3", required = true) @RequestParam List<Long> ids) {
         return locationService.getLocationsByIds(ids);
     }
 }
