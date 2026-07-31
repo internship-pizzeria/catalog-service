@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class LocationService {
@@ -38,5 +40,12 @@ public class LocationService {
         }
 
         return LocationPageResponse.from(page);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LocationResponse> getLocationsByIds(List<Long> ids) {
+        return locationRepository.findAllById(ids).stream()
+                .map(LocationResponse::from)
+                .toList();
     }
 }

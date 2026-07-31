@@ -17,10 +17,11 @@ class ProductController {
     private final ProductService productService;
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get product by ID", description = "Returns a single product by its unique identifier")
+    @Operation(summary = "Get product by ID", description = "Returns a single product by its unique identifier. If a locationId is provided, the product availability at that location is also returned.")
     public ProductResponse getProductById(
-            @Parameter(description = "Product ID", example = "1") @PathVariable Long id) {
-        return productService.getProductById(id);
+            @Parameter(description = "Product ID", example = "1") @PathVariable Long id,
+            @Parameter(description = "Location ID to check product availability at", example = "1") @RequestParam(required = false) Long locationId) {
+        return productService.getProductById(id, locationId);
     }
 
     @PostMapping

@@ -1,5 +1,8 @@
 package com.pizzera.catalog_service.product;
 
+import com.pizzera.catalog_service.ingredient.Ingredient;
+import com.pizzera.catalog_service.ingredient.IngredientCategory;
+import com.pizzera.catalog_service.ingredient.IngredientService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,6 +13,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -19,6 +23,9 @@ class ProductServiceTest {
 
     @Mock
     private ProductRepository productRepository;
+
+    @Mock
+    private IngredientService ingredientService;
 
     @InjectMocks
     private ProductService productService;
@@ -33,19 +40,74 @@ class ProductServiceTest {
         Product dummyProduct = new Product(productName, "Sos, ser", productPrice);
         ReflectionTestUtils.setField(dummyProduct, "id", productId);
 
-        when(productRepository.findById(productId))
+        when(productRepository.findByIdWithIngredients(productId))
                 .thenReturn(Optional.of(dummyProduct));
 
         // WHEN
-        ProductResponse result = productService.getProductById(productId);
+        ProductResponse result = productService.getProductById(productId, null);
 
         // THEN
         assertNotNull(result);
         assertEquals(productId, result.id());
         assertEquals(productName, result.name());
         assertEquals(productPrice, result.price());
+        assertTrue(result.available());
 
-        verify(productRepository, times(1)).findById(productId);
+        verify(productRepository, times(1)).findByIdWithIngredients(productId);
+    }
+
+    @Test
+    void shouldReturnProductAsAvailableWhenLocationIdProvidedAndAllIngredientsAvailable() {
+        // GIVEN
+        Long productId = 1L;
+        Long locationId = 10L;
+
+        Ingredient ingredient = new Ingredient(1L, "Ser", IngredientCategory.CHEESE);
+        ProductIngredient productIngredient = new ProductIngredient(ingredient);
+
+        Product product = new Product("Margherita", "Sos, ser", new BigDecimal("25.00"));
+        ReflectionTestUtils.setField(product, "id", productId);
+        ReflectionTestUtils.setField(product, "ingredients", List.of(productIngredient));
+
+        when(productRepository.findByIdWithIngredients(productId)).thenReturn(Optional.of(product));
+        when(ingredientService.findUnavailableIngredientIds(locationId)).thenReturn(Set.of(99L));
+
+        // WHEN
+        ProductResponse result = productService.getProductById(productId, locationId);
+
+        // THEN
+        assertNotNull(result);
+        assertTrue(result.available());
+
+        verify(productRepository).findByIdWithIngredients(productId);
+        verify(ingredientService).findUnavailableIngredientIds(locationId);
+    }
+
+    @Test
+    void shouldReturnProductAsUnavailableWhenLocationIdProvidedAndIngredientUnavailable() {
+        // GIVEN
+        Long productId = 1L;
+        Long locationId = 10L;
+
+        Ingredient ingredient = new Ingredient(1L, "Ser", IngredientCategory.CHEESE);
+        ProductIngredient productIngredient = new ProductIngredient(ingredient);
+
+        Product product = new Product("Margherita", "Sos, ser", new BigDecimal("25.00"));
+        ReflectionTestUtils.setField(product, "id", productId);
+        ReflectionTestUtils.setField(product, "ingredients", List.of(productIngredient));
+
+        when(productRepository.findByIdWithIngredients(productId)).thenReturn(Optional.of(product));
+        when(ingredientService.findUnavailableIngredientIds(locationId)).thenReturn(Set.of(1L));
+
+        // WHEN
+        ProductResponse result = productService.getProductById(productId, locationId);
+
+        // THEN
+        assertNotNull(result);
+        assertFalse(result.available());
+
+        verify(productRepository).findByIdWithIngredients(productId);
+        verify(ingredientService).findUnavailableIngredientIds(locationId);
     }
 
     @Test
@@ -53,17 +115,17 @@ class ProductServiceTest {
         // GIVEN
         Long nonExistentProductId = 99L;
 
-        when(productRepository.findById(nonExistentProductId))
+        when(productRepository.findByIdWithIngredients(nonExistentProductId))
                 .thenReturn(Optional.empty());
 
         // WHEN
         ProductNotFoundException exception = assertThrows(ProductNotFoundException.class, () -> {
-            productService.getProductById(nonExistentProductId);
+            productService.getProductById(nonExistentProductId, null);
         });
 
         // THEN
         assertEquals("Product with ID: " + nonExistentProductId + " not found.", exception.getReason());
-        verify(productRepository, times(1)).findById(nonExistentProductId);
+        verify(productRepository, times(1)).findByIdWithIngredients(nonExistentProductId);
     }
 
     @Test
@@ -104,19 +166,28 @@ class ProductServiceTest {
         BigDecimal pizzaPrice2 = new BigDecimal("32.00");
 
         Long nonExistentId = 999L;
+        Long locationId = 10L;
 
         List<Long> requestedIds = List.of(pizzaId1, pizzaId2, nonExistentId);
 
+        Ingredient ingredient1 = new Ingredient(1L, "Ser", IngredientCategory.CHEESE);
+        Ingredient ingredient2 = new Ingredient(2L, "Sos", IngredientCategory.SAUCE);
+        ProductIngredient pi1 = new ProductIngredient(ingredient1);
+        ProductIngredient pi2 = new ProductIngredient(ingredient2);
+
         Product pizza1 = new Product(pizzaName1, "Sos, ser", pizzaPrice1);
         ReflectionTestUtils.setField(pizza1, "id", pizzaId1);
+        ReflectionTestUtils.setField(pizza1, "ingredients", List.of(pi1, pi2));
 
         Product pizza2 = new Product(pizzaName2, "Sos, ser, salami", pizzaPrice2);
         ReflectionTestUtils.setField(pizza2, "id", pizzaId2);
+        ReflectionTestUtils.setField(pizza2, "ingredients", List.of(pi1));
 
-        when(productRepository.findAllById(requestedIds)).thenReturn(List.of(pizza1, pizza2));
+        when(productRepository.findAllByIdWithIngredients(requestedIds)).thenReturn(List.of(pizza1, pizza2));
+        when(ingredientService.findUnavailableIngredientIds(locationId)).thenReturn(Set.of(99L));
 
         // WHEN
-        List<InternalProductResponse> result = productService.getProductDetails(requestedIds);
+        List<InternalProductResponse> result = productService.getProductDetails(requestedIds, locationId);
 
         // THEN
         assertNotNull(result);
@@ -126,12 +197,15 @@ class ProductServiceTest {
         assertEquals(pizzaId1, response1.id());
         assertEquals(pizzaName1, response1.name());
         assertEquals(pizzaPrice1, response1.price());
+        assertTrue(response1.available());
 
         InternalProductResponse response2 = result.get(1);
         assertEquals(pizzaId2, response2.id());
         assertEquals(pizzaName2, response2.name());
         assertEquals(pizzaPrice2, response2.price());
+        assertTrue(response2.available());
 
-        verify(productRepository, times(1)).findAllById(requestedIds);
+        verify(productRepository, times(1)).findAllByIdWithIngredients(requestedIds);
+        verify(ingredientService).findUnavailableIngredientIds(locationId);
     }
 }

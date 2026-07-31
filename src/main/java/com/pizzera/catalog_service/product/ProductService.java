@@ -1,11 +1,13 @@
 package com.pizzera.catalog_service.product;
 
+import com.pizzera.catalog_service.ingredient.IngredientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 
 @Service
@@ -13,12 +15,22 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final IngredientService ingredientService;
 
     @Transactional(readOnly = true)
-    public ProductResponse getProductById(Long id) {
-        return productRepository.findById(id)
-                .map(ProductResponse::from)
+    public ProductResponse getProductById(Long id, Long locationId) {
+        Product product = productRepository.findByIdWithIngredients(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
+
+        boolean available = true;
+        if (locationId != null) {
+            Set<Long> unavailableIds = ingredientService.findUnavailableIngredientIds(locationId);
+            boolean hasUnavailable = product.getIngredients().stream()
+                    .anyMatch(pi -> unavailableIds.contains(pi.getIngredient().getId()));
+            available = !hasUnavailable;
+        }
+
+        return ProductResponse.from(product, available);
     }
 
 
@@ -38,10 +50,17 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<InternalProductResponse> getProductDetails(List<Long> productIds) {
-        return productRepository.findAllById(productIds)
-                .stream()
-                .map(InternalProductResponse::from)
+    public List<InternalProductResponse> getProductDetails(List<Long> productIds, Long locationId) {
+        Set<Long> unavailableIds = locationId != null
+                ? ingredientService.findUnavailableIngredientIds(locationId)
+                : Set.of();
+
+        return productRepository.findAllByIdWithIngredients(productIds).stream()
+                .map(product -> {
+                    boolean hasUnavailable = product.getIngredients().stream()
+                            .anyMatch(pi -> unavailableIds.contains(pi.getIngredient().getId()));
+                    return InternalProductResponse.from(product, !hasUnavailable);
+                })
                 .toList();
     }
 }

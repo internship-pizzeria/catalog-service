@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
+
 @RestController
 @RequestMapping("/api/v1/locations")
 @RequiredArgsConstructor
@@ -25,5 +28,12 @@ class LocationController {
             @Parameter(description = "City name to filter locations by") @RequestParam(required = false) String city,
             @PageableDefault(size = 20) Pageable pageable) {
         return locationService.getAllActiveLocations(city, pageable);
+    }
+
+    @GetMapping("/batch")
+    @Operation(summary = "Get locations by IDs", description = "Returns locations for the given list of IDs (internal service-to-service communication)")
+    public List<LocationResponse> getLocationsByIds(
+            @Parameter(description = "List of location IDs", example = "1,2,3") @RequestParam List<Long> ids) {
+        return locationService.getLocationsByIds(ids);
     }
 }
